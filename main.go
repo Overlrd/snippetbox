@@ -22,7 +22,7 @@ func home(w http.ResponseWriter, r *http.Request)  {
 	w.Write([]byte("hello, world"))
 }
 
-// snippetView: Displays a specific snippet
+// snippetView: Display a specific snippet
 func snippetView(w http.ResponseWriter, r *http.Request)  {
 	// Extract the value of the "id" wildcard from the request
 	// and sanitize it
@@ -36,9 +36,14 @@ func snippetView(w http.ResponseWriter, r *http.Request)  {
 	w.Write([]byte(msg))
 }
 
-// snippetCreate: Creates a snippet 
+// snippetCreate: Display a form for creating a new snippet
 func snippetCreate(w http.ResponseWriter, r *http.Request)  {
 	w.Write([]byte("Creates a snippet"))
+}
+
+// snippetCreatePost: Save a new snippet
+func snippetCreatePost(w http.ResponseWriter, r *http.Request)  {
+	w.Write([]byte("Save a new snippet"))
 }
 
 func main() {
@@ -47,6 +52,7 @@ func main() {
 	mux.HandleFunc("GET /{$}", home)
 	mux.HandleFunc("GET /snippet/view/{id}", snippetView)
 	mux.HandleFunc("GET /snippet/create", snippetCreate)
+	mux.HandleFunc("POST /snippet/create", snippetCreatePost)
 
 	// Start a new server with http.ListenAndServe
 	log.Println("Starting server on: 4000")
