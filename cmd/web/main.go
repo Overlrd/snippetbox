@@ -8,6 +8,10 @@ import (
 	"path/filepath"
 )
 
+type application struct {
+	logger *slog.Logger
+}
+
 func main() {
 	// Define command line flags
 	addr := flag.String("addr", ":4000", "HTTP network address")
@@ -18,6 +22,12 @@ func main() {
 		Level: slog.LevelDebug,
 		AddSource: true,
 	}))
+
+	// Initialize a new instance of the application struct, containing the
+	// dependencies
+	app := &application{
+		logger:logger,
+	}
 
 	// initialize new servermux
 	mux := http.NewServeMux()
@@ -36,13 +46,13 @@ func main() {
 	// "/static/" prefix before the request reaches the file server
 	mux.Handle("GET /static/", http.StripPrefix("/static", fileserver))
 
-	mux.HandleFunc("GET /{$}", home)
-	mux.HandleFunc("GET /snippet/view/{id}", snippetView)
-	mux.HandleFunc("GET /snippet/create", getSnippetCreate)
-	mux.HandleFunc("POST /snippet/create", postSnippetCreate)
+	mux.HandleFunc("GET /{$}", app.home)
+	mux.HandleFunc("GET /snippet/view/{id}", app.snippetView)
+	mux.HandleFunc("GET /snippet/create", app.getSnippetCreate)
+	mux.HandleFunc("POST /snippet/create", app.postSnippetCreate)
 
 	// Start a new server with http.ListenAndServe
-	logger.Info("starting server", slog.String("addr", *addr))
+	logger.Info("starting server", "addr", *addr)
 	err := http.ListenAndServe(*addr, mux)
 	logger.Error(err.Error())
 	os.Exit(1)
