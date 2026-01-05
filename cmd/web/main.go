@@ -2,8 +2,9 @@ package main
 
 import (
 	"flag"
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
 	"path/filepath"
 )
 
@@ -11,6 +12,12 @@ func main() {
 	// Define command line flags
 	addr := flag.String("addr", ":4000", "HTTP network address")
 	flag.Parse()
+
+	// Initialize a new logger
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+		AddSource: true,
+	}))
 
 	// initialize new servermux
 	mux := http.NewServeMux()
@@ -35,9 +42,10 @@ func main() {
 	mux.HandleFunc("POST /snippet/create", postSnippetCreate)
 
 	// Start a new server with http.ListenAndServe
-	log.Printf("Starting server on: %s\n", *addr)
+	logger.Info("starting server", slog.String("addr", *addr))
 	err := http.ListenAndServe(*addr, mux)
-	log.Fatal(err)
+	logger.Error(err.Error())
+	os.Exit(1)
 }
 
 type neuteredFileSystem struct {
