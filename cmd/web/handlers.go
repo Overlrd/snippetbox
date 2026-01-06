@@ -71,7 +71,24 @@ func (app *application) postSnippetCreate(w http.ResponseWriter, r *http.Request
 	// Use w.WriteHeader() method to send a 201 status code.
 	// Any changes made to the header map after calling w.WriteHeader()
 	// or w.Write() will have no effect on the headers that the user receives.
-	w.WriteHeader(http.StatusCreated)
+	// w.WriteHeader(http.StatusCreated)
+	//
+	// w.Write([]byte("Save a new snippet..."))
+	title := "O snall"
+	content := "O snail\nClimb Mount Fuji,\nBut slowly, slowly!\n\n– Kobayashi Issa" 
+	expires := 7
 
-	w.Write([]byte("Save a new snippet..."))
+	// Pass the data to the SnippetModel.Insert() method
+	id, err := app.Snippets.Insert(title, content, expires)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// Redirect the user to the relevant page for the snippet
+	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)
 }
+
+
+
+
