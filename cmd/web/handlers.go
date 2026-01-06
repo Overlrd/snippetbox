@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	"html/template"
+	// "html/template"
 	"net/http"
 	"strconv"
 
@@ -21,34 +21,45 @@ func (app *application)home(w http.ResponseWriter, r *http.Request) {
 	// 	http.NotFound(w, r)
 	// 	return
 	// }
-	
-	// Initialize a slice containing the paths to the template files 
-	// The file containing our base template must be the *first* file in the slice
-	files := []string{
-		"./ui/html/base.tmpl",
-		"./ui/html/partials/nav.tmpl",
-		"./ui/html/pages/home.tmpl",
-	}
+	w.Header().Add("Server", "Go")
 
-	// Use template.ParseFiles() function to read the template files into a
-	// template set and handle error
-	ts, err := template.ParseFiles(files...)
+	snippets, err := app.snippets.Latest()
 	if err != nil {
-		app.serverError(w, r, err) // Use the serverError helper
+		app.serverError(w, r, err)
 		return
 	}
 
-	// The we use the Execute() method on the template set to write the
-	// template content as the response body. The last parameter to Execute()
-	// represents any dynamic data that we want to pass in
-	// err = ts.Execute(w, nil)
-
-	// Use the ExecuteTemplate() method to write the content of the "base"
-	// template as the response body
-	err = ts.ExecuteTemplate(w, "base", nil)
-	if err != nil {
-		app.serverError(w, r, err)
+	for _, snippet := range snippets {
+		fmt.Fprintf(w, "%+v\n", snippet)
 	}
+	
+	// // Initialize a slice containing the paths to the template files 
+	// // The file containing our base template must be the *first* file in the slice
+	// files := []string{
+	// 	"./ui/html/base.tmpl",
+	// 	"./ui/html/partials/nav.tmpl",
+	// 	"./ui/html/pages/home.tmpl",
+	// }
+	//
+	// // Use template.ParseFiles() function to read the template files into a
+	// // template set and handle error
+	// ts, err := template.ParseFiles(files...)
+	// if err != nil {
+	// 	app.serverError(w, r, err) // Use the serverError helper
+	// 	return
+	// }
+	//
+	// // The we use the Execute() method on the template set to write the
+	// // template content as the response body. The last parameter to Execute()
+	// // represents any dynamic data that we want to pass in
+	// // err = ts.Execute(w, nil)
+	//
+	// // Use the ExecuteTemplate() method to write the content of the "base"
+	// // template as the response body
+	// err = ts.ExecuteTemplate(w, "base", nil)
+	// if err != nil {
+	// 	app.serverError(w, r, err)
+	// }
 }
 
 // snippetView: Display a specific snippet
@@ -64,7 +75,7 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 	// Use the SnippetModel.Get() method to retrieve the data for a
 	// specific record based on its ID. If no matching record is found,
 	// return a 404 Not Found response
-	snippet, err := app.Snippets.Get(id)
+	snippet, err := app.snippets.Get(id)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
 			http.NotFound(w, r)
@@ -96,7 +107,7 @@ func (app *application) postSnippetCreate(w http.ResponseWriter, r *http.Request
 	expires := 7
 
 	// Pass the data to the SnippetModel.Insert() method
-	id, err := app.Snippets.Insert(title, content, expires)
+	id, err := app.snippets.Insert(title, content, expires)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
