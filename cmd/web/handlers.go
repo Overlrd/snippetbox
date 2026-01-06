@@ -1,10 +1,13 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
 	"strconv"
+
+	"github.com/Overlrd/snippetbox/internal/models"
 )
 
 // home handler function
@@ -58,7 +61,21 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "Display a specific snippet with ID %d...", id)
+	// Use the SnippetModel.Get() method to retrieve the data for a
+	// specific record based on its ID. If no matching record is found,
+	// return a 404 Not Found response
+	snippet, err := app.Snippets.Get(id)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			http.NotFound(w, r)
+		} else {
+			app.serverError(w, r, err)
+		}
+		return
+	}
+	// Write the snippet data as plain-text HTTP response
+	fmt.Fprintf(w, "%+v", snippet)
+
 }
 
 // getSnippetCreate: Display a form for creating a new snippet
@@ -87,7 +104,7 @@ func (app *application) postSnippetCreate(w http.ResponseWriter, r *http.Request
 
 	// Redirect the user to the relevant page for the snippet
 	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)
-}
+} 
 
 
 
