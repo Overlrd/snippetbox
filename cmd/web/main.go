@@ -8,11 +8,14 @@ import (
 	"os"
 	"path/filepath"
 
+	// Import the models package prefixed with the application module path
+	"github.com/Overlrd/snippetbox/internal/models"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 type application struct {
 	logger *slog.Logger
+	Snippets *models.SnippetModel
 }
 
 func main() {
@@ -42,6 +45,7 @@ func main() {
 	// dependencies
 	app := &application{
 		logger:logger,
+		Snippets: &models.SnippetModel{DB: db},
 	}
 
 	logger.Info("starting server", "addr", *addr)
