@@ -10,7 +10,7 @@ import (
 )
 
 // home handler function
-func (app *application)home(w http.ResponseWriter, r *http.Request) {
+func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	// Restrict the home handler to the "/" url pattern
 	// also consider adding the restriction when registering the handler
 	// mux.HandleFunc("/{$}", home)
@@ -20,7 +20,6 @@ func (app *application)home(w http.ResponseWriter, r *http.Request) {
 	// 	http.NotFound(w, r)
 	// 	return
 	// }
-	w.Header().Add("Server", "Go")
 
 	snippets, err := app.snippets.Latest()
 	if err != nil {
@@ -29,7 +28,7 @@ func (app *application)home(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Call the newTemplateData() helper to get a templateData struct
-	// containing the 'default' data and add the snippets slice to it 
+	// containing the 'default' data and add the snippets slice to it
 	data := app.newTemplateData(r)
 	data.Snippets = snippets
 
@@ -64,7 +63,7 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 	data.Snippet = snippet
 
 	// Use the new render helper
-	app.render(w, r, http.StatusOK, "view.tmpl",data)
+	app.render(w, r, http.StatusOK, "view.tmpl", data)
 }
 
 // getSnippetCreate: Display a form for creating a new snippet
@@ -81,7 +80,7 @@ func (app *application) postSnippetCreate(w http.ResponseWriter, r *http.Request
 	//
 	// w.Write([]byte("Save a new snippet..."))
 	title := "O snall"
-	content := "O snail\nClimb Mount Fuji,\nBut slowly, slowly!\n\n– Kobayashi Issa" 
+	content := "O snail\nClimb Mount Fuji,\nBut slowly, slowly!\n\n– Kobayashi Issa"
 	expires := 7
 
 	// Pass the data to the SnippetModel.Insert() method
@@ -93,8 +92,4 @@ func (app *application) postSnippetCreate(w http.ResponseWriter, r *http.Request
 
 	// Redirect the user to the relevant page for the snippet
 	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)
-} 
-
-
-
-
+}

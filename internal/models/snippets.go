@@ -9,8 +9,8 @@ import (
 // Define a snippet type to hold the datat for an individual snippet
 // The fields of the struct correspond to the fields in the MySQL "snippets" table
 type Snippet struct {
-	ID int
-	Title string
+	ID      int
+	Title   string
 	Content string
 	Created time.Time
 	Expires time.Time
@@ -40,7 +40,6 @@ func (m *SnippetModel) Insert(title string, content string, expires int) (int, e
 		return 0, err
 	}
 
-
 	return int(id), nil
 }
 
@@ -58,7 +57,7 @@ func (m *SnippetModel) Get(id int) (Snippet, error) {
 	// Initialize a new zeroed Snippet struct
 	var s Snippet
 
-	// Use row.Scan() to copy the values from each field in sql.Row to the 
+	// Use row.Scan() to copy the values from each field in sql.Row to the
 	// corresponding field in the Snippet struct. Notice that the arguments
 	// to row.Scan are *pointers* to the place you want to copy the data into,
 	// and the number of arguments must be exactly the same as the number of the
@@ -66,7 +65,7 @@ func (m *SnippetModel) Get(id int) (Snippet, error) {
 	err := row.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
 	if err != nil {
 		// If the query returns no rows, then row.Scan() will return a
-		// sql.ErrNoRows error. We use the errors.Is() function to check for 
+		// sql.ErrNoRows error. We use the errors.Is() function to check for
 		// that error specifically, and return our own ErrNoRecord error instead
 		if errors.Is(err, sql.ErrNoRows) {
 			return Snippet{}, ErrNoRecord
@@ -109,7 +108,7 @@ func (m *SnippetModel) Latest() ([]Snippet, error) {
 	for rows.Next() {
 		var s Snippet
 
-		err = rows.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires) 
+		err = rows.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
 		if err != nil {
 			return nil, err
 		}
@@ -117,7 +116,7 @@ func (m *SnippetModel) Latest() ([]Snippet, error) {
 	}
 
 	// When the rows.Next() loop has finished we call rows.Err() to retrieve any
-	// error that was encountered during the iteration. 
+	// error that was encountered during the iteration.
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}

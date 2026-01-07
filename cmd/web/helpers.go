@@ -14,8 +14,8 @@ import (
 func (app *application) serverError(w http.ResponseWriter, r *http.Request, err error) {
 	var (
 		method = r.Method
-		url = r.URL.RequestURI()
-		trace = string(debug.Stack())
+		url    = r.URL.RequestURI()
+		trace  = string(debug.Stack())
 	)
 
 	app.logger.Error(err.Error(), "method", method, "url", url, "trace", trace)
@@ -28,7 +28,7 @@ func (app *application) clientError(w http.ResponseWriter, status int) {
 	http.Error(w, http.StatusText(status), status)
 }
 
-func (app *application) render (w http.ResponseWriter, r *http.Request, status int, page string, data templateData) {
+func (app *application) render(w http.ResponseWriter, r *http.Request, status int, page string, data templateData) {
 	// Retrive the appropriate template set from the cache besed on the page
 	// name. If no entry exists in the cache with the provided name
 	// then create a new error and call the serverError() helper method

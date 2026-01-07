@@ -12,8 +12,8 @@ import (
 // any dynamic data that we want to pass to our HTML templates.
 type templateData struct {
 	CurrentYear int
-	Snippet models.Snippet
-	Snippets []models.Snippet
+	Snippet     models.Snippet
+	Snippets    []models.Snippet
 }
 
 // Create a humanDate function which returns a nicely formatted string
@@ -25,11 +25,11 @@ func humanDate(t time.Time) string {
 // Initialize a template.FuncMap object and store it in a global variable.
 // This is a string-keyed map which acts as a lookup between the names of
 // the custom template functions and the functions themselves.
-var functions = template.FuncMap {
+var functions = template.FuncMap{
 	"humanDate": humanDate,
 }
 
-func newTemplateCache() (map[string]*template.Template, error)  {
+func newTemplateCache() (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}
 
 	pages, err := filepath.Glob("./ui/html/pages/*.tmpl")
@@ -66,4 +66,3 @@ func newTemplateCache() (map[string]*template.Template, error)  {
 
 	return cache, nil
 }
-

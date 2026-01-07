@@ -15,8 +15,8 @@ import (
 )
 
 type application struct {
-	logger *slog.Logger
-	snippets *models.SnippetModel
+	logger        *slog.Logger
+	snippets      *models.SnippetModel
 	templateCache map[string]*template.Template
 }
 
@@ -28,7 +28,7 @@ func main() {
 
 	// Initialize a new logger
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelDebug,
+		Level:     slog.LevelDebug,
 		AddSource: true,
 	}))
 
@@ -53,8 +53,8 @@ func main() {
 	// Initialize a new instance of the application struct, containing the
 	// dependencies
 	app := &application{
-		logger:logger,
-		snippets: &models.SnippetModel{DB: db},
+		logger:        logger,
+		snippets:      &models.SnippetModel{DB: db},
 		templateCache: templateCache,
 	}
 
@@ -86,8 +86,8 @@ type neuteredFileSystem struct {
 	fs http.FileSystem
 }
 
-func (nfs neuteredFileSystem) Open(path string) (http.File, error)  {
-	f, err := nfs.fs.Open(path)	
+func (nfs neuteredFileSystem) Open(path string) (http.File, error) {
+	f, err := nfs.fs.Open(path)
 	if err != nil {
 		return nil, err
 	}
