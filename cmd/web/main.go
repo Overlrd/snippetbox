@@ -11,6 +11,8 @@ import (
 
 	// Import the models package prefixed with the application module path
 	"github.com/Overlrd/snippetbox/internal/models"
+
+	"github.com/go-playground/form/v4"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -18,6 +20,7 @@ type application struct {
 	logger        *slog.Logger
 	snippets      *models.SnippetModel
 	templateCache map[string]*template.Template
+	formDecoder   *form.Decoder
 }
 
 func main() {
@@ -50,12 +53,16 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Initializea form decoder instance
+	formDecoder := form.NewDecoder()
+
 	// Initialize a new instance of the application struct, containing the
 	// dependencies
 	app := &application{
 		logger:        logger,
 		snippets:      &models.SnippetModel{DB: db},
 		templateCache: templateCache,
+		formDecoder:   formDecoder,
 	}
 
 	logger.Info("starting server", "addr", *addr)

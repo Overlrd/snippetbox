@@ -15,3 +15,4 @@ of them and guidance about which one to use in this  [blog post](https://www.ale
 
 ## Tips
  - [Patterns for processing and validating different types if input](https://www.alexedwards.net/blog/validation-snippets-for-go)
+ - [Go generics tutorial](https://go.dev/doc/tutorial/generics)
