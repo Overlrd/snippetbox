@@ -12,3 +12,6 @@ The Go (1.23) standard library routing doesn't support the following:
 If you need these features in your application, you’ll need to use a third-party router package.
 The ones that I recommend are httprouter, chi, flow and gorilla/mux, and you can find a comparison
 of them and guidance about which one to use in this  [blog post](https://www.alexedwards.net/blog/which-go-router-should-i-use).
+
+## Tips
+ - [Patterns for processing and validating different types if input](https://www.alexedwards.net/blog/validation-snippets-for-go)
