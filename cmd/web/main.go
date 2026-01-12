@@ -75,10 +75,17 @@ func main() {
 		sessionManager: SessionManager,
 	}
 
+	// Initialize a new http.Server struct
+	srv := &http.Server{
+		Addr:     *addr,
+		Handler:  app.routes(),
+		ErrorLog: slog.NewLogLogger(logger.Handler(), slog.LevelError),
+	}
+
 	logger.Info("starting server", "addr", *addr)
 
 	// Start a new server with http.ListenAndServe
-	err = http.ListenAndServe(*addr, app.routes())
+	err = srv.ListenAndServe()
 	logger.Error(err.Error())
 	os.Exit(1)
 }
