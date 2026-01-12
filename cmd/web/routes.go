@@ -23,10 +23,16 @@ func (app *application) routes() http.Handler {
 	// "/static/" prefix before the request reaches the file server
 	mux.Handle("GET /static/", http.StripPrefix("/static", fileserver))
 
-	mux.HandleFunc("GET /{$}", app.home)
-	mux.HandleFunc("GET /snippet/view/{id}", app.snippetView)
-	mux.HandleFunc("GET /snippet/create", app.getSnippetCreate)
-	mux.HandleFunc("POST /snippet/create", app.postSnippetCreate)
+	// Create a new middleware chain containing the middleware specific to
+	// the dynamic routes.
+	dynamic := alice.New(app.sessionManager.LoadAndSave)
+
+	// Update these routes to use the nes dynamic middleware chain
+
+	mux.Handle("GET /{$}", dynamic.ThenFunc(app.home))
+	mux.Handle("GET /snippet/view/{id}", dynamic.ThenFunc(app.snippetView))
+	mux.Handle("GET /snippet/create", dynamic.ThenFunc(app.getSnippetCreate))
+	mux.Handle("POST /snippet/create", dynamic.ThenFunc(app.postSnippetCreate))
 
 	// Create a middleware chain containing our 'standard' middleware
 	// which will be used for every request our application receives.

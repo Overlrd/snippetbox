@@ -8,19 +8,24 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	// Import the models package prefixed with the application module path
 	"github.com/Overlrd/snippetbox/internal/models"
 
 	"github.com/go-playground/form/v4"
 	_ "github.com/go-sql-driver/mysql"
+
+	"github.com/alexedwards/scs/mysqlstore"
+	"github.com/alexedwards/scs/v2"
 )
 
 type application struct {
-	logger        *slog.Logger
-	snippets      *models.SnippetModel
-	templateCache map[string]*template.Template
-	formDecoder   *form.Decoder
+	logger         *slog.Logger
+	snippets       *models.SnippetModel
+	templateCache  map[string]*template.Template
+	formDecoder    *form.Decoder
+	sessionManager *scs.SessionManager
 }
 
 func main() {
@@ -56,13 +61,18 @@ func main() {
 	// Initializea form decoder instance
 	formDecoder := form.NewDecoder()
 
+	// Initialize the session manager
+	SessionManager := scs.New()
+	SessionManager.Store = mysqlstore.New(db)
+	SessionManager.Lifetime = 12 * time.Hour
 	// Initialize a new instance of the application struct, containing the
 	// dependencies
 	app := &application{
-		logger:        logger,
-		snippets:      &models.SnippetModel{DB: db},
-		templateCache: templateCache,
-		formDecoder:   formDecoder,
+		logger:         logger,
+		snippets:       &models.SnippetModel{DB: db},
+		templateCache:  templateCache,
+		formDecoder:    formDecoder,
+		sessionManager: SessionManager,
 	}
 
 	logger.Info("starting server", "addr", *addr)

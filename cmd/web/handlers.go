@@ -8,7 +8,6 @@ import (
 
 	"github.com/Overlrd/snippetbox/internal/models"
 	"github.com/Overlrd/snippetbox/internal/validator"
-	"github.com/go-playground/form/v4"
 )
 
 // Update our snippetCreateForm struct to include tags which tell the
