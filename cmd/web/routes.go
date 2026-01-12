@@ -28,11 +28,16 @@ func (app *application) routes() http.Handler {
 	dynamic := alice.New(app.sessionManager.LoadAndSave)
 
 	// Update these routes to use the nes dynamic middleware chain
-
 	mux.Handle("GET /{$}", dynamic.ThenFunc(app.home))
 	mux.Handle("GET /snippet/view/{id}", dynamic.ThenFunc(app.snippetView))
 	mux.Handle("GET /snippet/create", dynamic.ThenFunc(app.getSnippetCreate))
 	mux.Handle("POST /snippet/create", dynamic.ThenFunc(app.postSnippetCreate))
+
+	mux.Handle("GET /user/signup", dynamic.ThenFunc(app.getUserSignup))
+	mux.Handle("POST /user/signup", dynamic.ThenFunc(app.postUserSignup))
+	mux.Handle("GET /user/login", dynamic.ThenFunc(app.getUserLogin))
+	mux.Handle("POST /user/login", dynamic.ThenFunc(app.postUserLogin))
+	mux.Handle("POST /user/logout", dynamic.ThenFunc(app.postUserLogout))
 
 	// Create a middleware chain containing our 'standard' middleware
 	// which will be used for every request our application receives.
