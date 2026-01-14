@@ -17,3 +17,4 @@ of them and guidance about which one to use in this  [blog post](https://www.ale
  - [Patterns for processing and validating different types if input](https://www.alexedwards.net/blog/validation-snippets-for-go)
  - [Go generics tutorial](https://go.dev/doc/tutorial/generics)
  - [Production TLS certificate](https://letsencrypt.org/)
+ - [Valid email address - HTML standard](https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address)
