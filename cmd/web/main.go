@@ -98,8 +98,8 @@ func main() {
 
 	logger.Info("starting server", "addr", *addr)
 
-	// Start a new server with http.ListenAndServe
-	err = srv.ListenAndServe()
+	// ListenAndServeTLS() to start the HTTPS server
+	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 	logger.Error(err.Error())
 	os.Exit(1)
 }

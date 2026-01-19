@@ -10,14 +10,6 @@ import (
 	"github.com/Overlrd/snippetbox/internal/validator"
 )
 
-// Create a new UserSignupForm struct
-type userSignupForm struct {
-	Name                string `form:"name"`
-	Email               string `form:"email"`
-	Password            string `form:"password"`
-	validator.Validator `form:"."`
-}
-
 // Update our snippetCreateForm struct to include tags which tell the
 // decocer how to map HTML form values into the different struct fields.
 // The struct tag 'form:"-"' telles the decoder to completely ignore a
@@ -27,6 +19,21 @@ type snippetCreateForm struct {
 	Content             string `form:"content"`
 	Expires             int    `form:"expires"`
 	validator.Validator `form:"-"`
+}
+
+// Create a new UserSignupForm struct
+type userSignupForm struct {
+	Name                string `form:"name"`
+	Email               string `form:"email"`
+	Password            string `form:"password"`
+	validator.Validator `form:"."`
+}
+
+// Create a new userLoginForm struct
+type userLoginForm struct {
+	Email               string `form:"email"`
+	Password            string `form:"password"`
+	validator.Validator `form:"."`
 }
 
 // home handler function
@@ -209,13 +216,78 @@ func (app *application) postUserSignup(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) getUserLogin(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Display a form to logging in a user...")
+	data := app.newTemplateData(r)
+	data.Form = userLoginForm{}
+	app.render(w, r, http.StatusOK, "login.tmpl", data)
 }
 
 func (app *application) postUserLogin(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Authenticate and login the user...")
+	var form userLoginForm
+
+	err := app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// Validation checks
+	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
+	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
+	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
+
+	if !form.Valid() {
+		data := app.newTemplateData(r)
+		data.Form = form
+		app.render(w, r, http.StatusUnprocessableEntity, "login.tmpl", data)
+		return
+	}
+
+	// Check whether the credentials are valid. If they do not, add a generic
+	// non-field error message and re-display the login page
+	id, err := app.users.Authenticate(form.Email, form.Password)
+	if err != nil {
+		if errors.Is(err, models.ErrInvalidCredentials) {
+			form.AddNonFieldError("Email or password is incorrect")
+
+			data := app.newTemplateData(r)
+			data.Form = form
+			app.render(w, r, http.StatusUnprocessableEntity, "login.tmpl", data)
+		} else {
+			app.serverError(w, r, err)
+		}
+		return
+	}
+
+	// Change the session ID: Recommened when the authentication state or
+	// privilege levels changes for the user.
+	err = app.sessionManager.RenewToken(r.Context())
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// Add the ID of the user to the session
+	app.sessionManager.Put(r.Context(), "authenticatedUserID", id)
+
+	// Redirect the user to the create snippet page
+	http.Redirect(w, r, "/snippet/create", http.StatusSeeOther)
 }
 
 func (app *application) postUserLogout(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Logout the user...")
+	err := app.sessionManager.RenewToken(r.Context())
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// Remove the authenticatedUserID from the session data so that the user
+	// is logged out.
+	app.sessionManager.Remove(r.Context(), "authenticatedUserID")
+
+	// Add a flash message to confirm to the user that they've been
+	// logged out.
+	app.sessionManager.Put(r.Context(), "flash", "You've been logged out successfully!")
+
+	// Redirect the user to the application home page
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
