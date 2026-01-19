@@ -19,3 +19,4 @@ of them and guidance about which one to use in this  [blog post](https://www.ale
  - [Production TLS certificate](https://letsencrypt.org/)
  - [Valid email address - HTML standard](https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address)
  - [OWASP cheatsheet series](https://cheatsheetseries.owasp.org/index.html)
+ - [CRSF demystified](https://www.gnucitizen.org/blog/csrf-demystified/)
