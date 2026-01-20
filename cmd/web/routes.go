@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Overlrd/snippetbox/ui"
 	"github.com/justinas/alice"
 	"net/http"
 )
@@ -9,19 +10,11 @@ func (app *application) routes() http.Handler {
 	// initialize new servermux
 	mux := http.NewServeMux()
 
-	// Create a file server which serves files out of the "./ui/static" directory.
-	// Note that the path given to the http.Dir functin is relative to the project directory root.
-	// We're using a custom FileSystem that checks if the requested path is a directory
-	// If it is a directory we then try to Open() any index.html file in it. If no index.html
-	// file exists, then this will return a os.ErrNotExist error (which in turn we return and
-	// it will be transformed into a 404 Not Found response by http.Fileserver).
-	fileserver := http.FileServer(neuteredFileSystem{http.Dir("./ui/static")})
-	mux.Handle("./ui/static", http.NotFoundHandler())
-
-	// Use the mux.Handler() function to register the file server as the handler for
-	// all URL paths that start with "/static/". For matching paths, we strip the
-	// "/static/" prefix before the request reaches the file server
-	mux.Handle("GET /static/", http.StripPrefix("/static", fileserver))
+	// Use http.FileServerFS() function to create a HTTP handler which
+	// serves the embedded files in ui.Files. The static file are located
+	// in the "static" folder of th ui.Files embedded filesystem, so there
+	// is no more need to strip the prefix from the request URL
+	mux.Handle("GET /static/", http.FileServerFS(ui.Files))
 
 	// Unprotected application routes using the "dynamic" middleware chain.
 	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf, app.authenticate)
