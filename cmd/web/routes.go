@@ -16,6 +16,9 @@ func (app *application) routes() http.Handler {
 	// is no more need to strip the prefix from the request URL
 	mux.Handle("GET /static/", http.FileServerFS(ui.Files))
 
+	// Add a new GET /ping route.
+	mux.HandleFunc("GET /ping", ping)
+
 	// Unprotected application routes using the "dynamic" middleware chain.
 	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf, app.authenticate)
 
