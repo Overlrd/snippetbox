@@ -6,6 +6,12 @@ import (
 	"time"
 )
 
+type SnippetModelInterface interface {
+	Insert(title string, content string, expires int) (int, error)
+	Get(id int) (Snippet, error)
+	Latest() ([]Snippet, error)
+}
+
 // Define a snippet type to hold the datat for an individual snippet
 // The fields of the struct correspond to the fields in the MySQL "snippets" table
 type Snippet struct {
